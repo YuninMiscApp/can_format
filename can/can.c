@@ -146,15 +146,18 @@ int can_format_userdata2motorola(UINT64 srcData,UINT8 startBit,
 	RETURN_VAL_IF_FAIL(bitLen > 0 && bitLen <= 64, -1);
 	RETURN_VAL_IF_FAIL(startBit < 64, -1);
 	
+	UINT8 motoralaStartBit = 0;
 	int i;
 	UINT64 mask = 0;
 	UINT64 result = *dstDataInOut;
 	can_data_format_u canDataFormat;
 	UINT8 maxBitLen = 0;
-	
+
 	//检查非法输入条件
 	maxBitLen = (8*(startBit/8)+(8 - startBit%8));
 	RETURN_VAL_IF_FAIL(bitLen <= maxBitLen, -1);
+	// 1. 转换起始位.
+	motoralaStartBit = CAN_FORMAT_START_BIT_I2M(startBit);
 	//
 	memset(&canDataFormat,0,sizeof(canDataFormat));
 	
@@ -163,7 +166,7 @@ int can_format_userdata2motorola(UINT64 srcData,UINT8 startBit,
 		mask |= 1 << i;
 	}
 
-	canDataFormat.data = (srcData & mask) << startBit;
+	canDataFormat.data = (srcData & mask) << motoralaStartBit;
 	// 2. 逆序字节序.
 	for(i = 0;i < 4;i++)
 	{
@@ -173,8 +176,8 @@ int can_format_userdata2motorola(UINT64 srcData,UINT8 startBit,
 	//
 	result |= canDataFormat.data;
 	*dstDataInOut = result;
-	CAN_DEBUG("[%s,%d]: srcData=0x%llx, startBit=%u,  bitLen=%u, mask=0x%llx, result=0x%llx, dstDataInOut=0x%llx \n",
-	__func__,__LINE__,srcData,startBit,bitLen,mask,result,*dstDataInOut);
+	CAN_DEBUG("[%s,%d]: srcData=0x%llx, startBit=%u, motoralaStartBit=%u, bitLen=%u, mask=0x%llx, result=0x%llx, dstDataOutput=0x%llx \n",
+	__func__,__LINE__,srcData,startBit,motoralaStartBit,bitLen,mask,result,*dstDataInOut);
     return 0;
 }
 
