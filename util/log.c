@@ -23,9 +23,11 @@
 #include <fcntl.h>
 #include <stdarg.h>
 #include <pthread.h>
+#include <sys/prctl.h>
 
 #include "log.h"
 #include "types.h"
+#include "util.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -59,6 +61,8 @@ void log_assert(const char *source
 		
 	colour = RED;
 
+	system_thread_get_name(threadName);
+	
 	len += snprintf(_log_buffer+len,sizeof(_log_buffer)-len,"%s(%s): assertion failed %s: %d: %s "
 	,colour?colour:""
 	,source ? source : threadName,

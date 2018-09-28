@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 	    RETURN_VAL_IF_FAIL(1 == sscanf(argv[3],"%u",&startBit), -1);
 	    RETURN_VAL_IF_FAIL(1 == sscanf(argv[4],"%u",&bitLen), -1);
 	    printf(GREEN"Input: canData=0x%llx,startBit=%u,bitLen=%u\n"NONE,canData,startBit,bitLen);
-		can_format_motorola2userdata(canData,startBit,bitLen,&result);
+		RETURN_VAL_IF_FAIL(0 == can_format_motorola2userdata(canData,startBit,bitLen,&result),-1);
 		printf(YELLOW"Output: result=0x%llx\n"NONE,result);
 	}
 	else

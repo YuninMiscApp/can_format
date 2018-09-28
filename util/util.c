@@ -24,6 +24,10 @@
 #include <stdarg.h>
 #include <pthread.h>
 
+#include <sched.h>
+#include <sys/prctl.h>
+#include <ctype.h>
+
 #include "util.h"
 #include "diagnosis.h"
 
@@ -42,6 +46,14 @@ void byte_swap(unsigned char *a, unsigned char *b)
 	unsigned char t = *a;
 	*a = *b;
 	*b = t;
+}
+
+
+void system_thread_get_name (const char *name)
+{
+#ifdef PR_GET_NAME
+    prctl (PR_GET_NAME, name, 0, 0, 0, 0);
+#endif
 }
 
 #ifdef  __cplusplus

@@ -32,6 +32,7 @@ extern "C" {
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 void byte_swap(unsigned char *a, unsigned char *b);
+void system_thread_get_name (const char *name);
 
 #ifdef  __cplusplus
 }
