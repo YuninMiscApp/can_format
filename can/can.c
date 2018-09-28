@@ -42,6 +42,7 @@ typedef union {
 #define CAN_FORMAT_START_BIT_M2I(sb) ((sb)%8 + (7 - (sb)/8)*8)
 #define CAN_FORMAT_START_BIT_I2M(sb) CAN_FORMAT_START_BIT_M2I(sb)
 /* Private variables ---------------------------------------------------------*/
+#define CAN_DEBUG(args...)	printf(args)
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -60,12 +61,18 @@ int can_format_motorola2userdata(UINT64 srcData,UINT8 startBit,
 {
 	RETURN_VAL_IF_FAIL(dstDataOutput, -1);
 	RETURN_VAL_IF_FAIL(bitLen > 0 && bitLen <= 64, -1);
-	RETURN_VAL_IF_FAIL(startBit < 64 && bitLen <= startBit, -1);
+	RETURN_VAL_IF_FAIL(startBit < 64, -1);
+	
 	UINT8 intelStartBit = 0;
 	int i;
 	UINT64 mask = 0;
 	UINT64 result = 0;
 	can_data_format_u canDataFormat;
+	UINT8 maxBitLen = 0;
+	
+	//检查非法输入条件
+	maxBitLen = (8*(startBit/8)+(8 - startBit%8));
+	RETURN_VAL_IF_FAIL(bitLen <= maxBitLen, -1);
 	// 1. 转换起始位.
 	intelStartBit = CAN_FORMAT_START_BIT_M2I(startBit);
 	// 2. 逆序字节序.
@@ -84,8 +91,8 @@ int can_format_motorola2userdata(UINT64 srcData,UINT8 startBit,
 	result = (canDataFormat.data >> intelStartBit) & mask;
 
 	*dstDataOutput = result;
-	printf("srcData=0x%llx, startBit=%u, intelStartBit=%u, bitLen=%u, mask=0x%llx, result=0x%llx, dstDataOutput=0x%llx \n",
-	srcData,startBit,intelStartBit,bitLen,mask,result,*dstDataOutput);
+	CAN_DEBUG("[%s,%d]: srcData=0x%llx, startBit=%u, intelStartBit=%u, bitLen=%u, mask=0x%llx, result=0x%llx, dstDataOutput=0x%llx \n",
+	__func__,__LINE__,srcData,startBit,intelStartBit,bitLen,mask,result,*dstDataOutput);
     return 0;
 }
 
@@ -102,8 +109,8 @@ int can_format_intel2userdata(UINT64 srcData,UINT8 startBit,
 	UINT32 bitLen,UINT64 *dstDataOutput)
 {
 	RETURN_VAL_IF_FAIL(dstDataOutput, -1);
-	RETURN_VAL_IF_FAIL(bitLen > 0 && bitLen <= 64, -1);
-	RETURN_VAL_IF_FAIL(startBit < 64 && bitLen <= startBit, -1);
+	RETURN_VAL_IF_FAIL((startBit+bitLen) <= 64, -1);
+	
 	int i;
 	UINT64 mask = 0;
 	UINT64 result = 0;
@@ -116,8 +123,8 @@ int can_format_intel2userdata(UINT64 srcData,UINT8 startBit,
 	result = (srcData >> startBit) & mask;
 
 	*dstDataOutput = result;
-	printf("srcData=0x%llx, startBit=%u, bitLen=%u, mask=0x%llx, result=0x%llx, dstDataOutput=0x%llx \n",
-	srcData,startBit,bitLen,mask,result,*dstDataOutput);	
+	CAN_DEBUG("[%s,%d]: srcData=0x%llx, startBit=%u, bitLen=%u, mask=0x%llx, result=0x%llx, dstDataOutput=0x%llx \n",
+	__func__,__LINE__,srcData,startBit,bitLen,mask,result,*dstDataOutput);	
 	
     return 0;
 }
@@ -137,13 +144,18 @@ int can_format_userdata2motorola(UINT64 srcData,UINT8 startBit,
 {
 	RETURN_VAL_IF_FAIL(dstDataInOut, -1);
 	RETURN_VAL_IF_FAIL(bitLen > 0 && bitLen <= 64, -1);
-	RETURN_VAL_IF_FAIL(startBit < 64 && bitLen <= startBit, -1);
+	RETURN_VAL_IF_FAIL(startBit < 64, -1);
 	
 	int i;
 	UINT64 mask = 0;
 	UINT64 result = *dstDataInOut;
 	can_data_format_u canDataFormat;
-
+	UINT8 maxBitLen = 0;
+	
+	//检查非法输入条件
+	maxBitLen = (8*(startBit/8)+(8 - startBit%8));
+	RETURN_VAL_IF_FAIL(bitLen <= maxBitLen, -1);
+	//
 	memset(&canDataFormat,0,sizeof(canDataFormat));
 	
 	for(i = 0;i < bitLen;i++)
@@ -161,6 +173,8 @@ int can_format_userdata2motorola(UINT64 srcData,UINT8 startBit,
 	//
 	result |= canDataFormat.data;
 	*dstDataInOut = result;
+	CAN_DEBUG("[%s,%d]: srcData=0x%llx, startBit=%u,  bitLen=%u, mask=0x%llx, result=0x%llx, dstDataInOut=0x%llx \n",
+	__func__,__LINE__,srcData,startBit,bitLen,mask,result,*dstDataInOut);
     return 0;
 }
 
@@ -177,8 +191,7 @@ int can_format_userdata2intel(UINT64 srcData,UINT8 startBit,
 	UINT32 bitLen,UINT64 *dstDataInOut)
 {
 	RETURN_VAL_IF_FAIL(dstDataInOut, -1);
-	RETURN_VAL_IF_FAIL(bitLen > 0 && bitLen <= 64, -1);
-	RETURN_VAL_IF_FAIL(startBit < 64 && bitLen <= startBit, -1);
+	RETURN_VAL_IF_FAIL((startBit+bitLen) <= 64, -1);
 	int i;
 	UINT64 mask = 0;
 	UINT64 result = *dstDataInOut;
@@ -190,7 +203,8 @@ int can_format_userdata2intel(UINT64 srcData,UINT8 startBit,
 
 	result |= (srcData & mask) << startBit;
 	*dstDataInOut = result;
-	
+	CAN_DEBUG("[%s,%d]: srcData=0x%llx, startBit=%u, bitLen=%u, mask=0x%llx, result=0x%llx, dstDataInOut=0x%llx \n",
+	__func__,__LINE__,srcData,startBit,bitLen,mask,result,*dstDataInOut);	
     return 0;
 }
 
