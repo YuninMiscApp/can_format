@@ -18,6 +18,8 @@ RANLIB	= $(CROSS_COMPILE)RANLIB
 CFLAGS =
 CFLAGS += -rdynamic -pipe -O2 -Wall
 CFLAGS += -I include
+CFLAGS += -I util
+CFLAGS += -I can
 
 LDFLAGS = 
 LDFLAGS += -fPIC -rdynamic -shared 
