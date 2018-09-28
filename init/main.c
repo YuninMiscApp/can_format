@@ -35,6 +35,8 @@ extern "C" {
 /* Private typedef -----------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 #define MAX_CAN_FORMAT_DATA0 0x0000E0ffff030000
+#define MAX_CAN_FORMAT_DATA1 0x00005555AAAA0000
+
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -48,6 +50,7 @@ static void __can_format_auto(void)
     UINT64 result = 0;
 
     //测试一
+    printf(PURPLE"=========================== Test1 ===========================\n"NONE);
     canData = MAX_CAN_FORMAT_DATA0;
     startBit = 45;
     bitLen = 21;
@@ -58,8 +61,19 @@ static void __can_format_auto(void)
 		printf(YELLOW"Output: result=0x%llx\n"NONE,result);	
 		bitLen--;
 	}
+    //测试二
+    printf(PURPLE"=========================== Test2 ===========================\n"NONE);
+    canData = MAX_CAN_FORMAT_DATA1;
+    startBit = 40;
+    bitLen = 32;
+	for(i = 0;i < 32;i++)
+	{
+ 		printf(GREEN"Input: canData=0x%llx,startBit=%u,bitLen=%u\n"NONE,canData,startBit,bitLen);
+		can_format_motorola2intel(canData,startBit,bitLen,&result);
+		printf(YELLOW"Output: result=0x%llx\n"NONE,result);	
+		bitLen--;
+	}
 
-	
 }
 
 //-----------------------------------------------------------------------------
