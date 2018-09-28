@@ -84,7 +84,8 @@ int can_format_motorola2intel(UINT64 srcData,UINT8 startBit,
 	result = (canDataFormat.data >> intelStartBit) & mask;
 
 	*dstDataOutput = result;
-	
+	printf("srcData=0x%llx, startBit=%u, intelStartBit=%u, bitLen=%u, mask=0x%llx, result=0x%llx, dstDataOutput=0x%llx \n",
+	srcData,startBit,intelStartBit,bitLen,mask,result,*dstDataOutput);
     return 0;
 }
 

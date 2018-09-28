@@ -25,6 +25,7 @@
 #include <pthread.h>
 
 #include "log.h"
+#include "types.h"
 
 #ifdef  __cplusplus
 extern "C" {
@@ -35,10 +36,6 @@ extern "C" {
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-#undef NONE
-#define NONE  "\e[0m"
-#undef RED
-#define RED   "\e[0;31m"
 
 /***************************************************
  * Function : log_assert

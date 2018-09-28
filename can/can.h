@@ -33,6 +33,8 @@ extern "C" {
 /* Exported variables --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
+int can_format_motorola2intel(UINT64 srcData,UINT8 startBit,
+	UINT32 bitLen,UINT64 *dstDataOutput);
 
 #ifdef  __cplusplus
 }

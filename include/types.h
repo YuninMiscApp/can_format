@@ -45,6 +45,12 @@ typedef unsigned long long	  UINT64;
 #define FAIL -1
 
 
+#define NONE  "\e[0m"
+#define RED   "\e[0;31m"
+#define GREEN "\e[0;32m"
+#define YELLOW "\e[1;33m"
+#define CYAN "\e[0;36m"
+#define PURPLE "\e[0;35m"
 
 #ifdef  __cplusplus
 }
