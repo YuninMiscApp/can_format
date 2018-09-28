@@ -47,7 +47,7 @@ typedef union {
 
 
 /***************************************************
- * Function : can_format_motorola2intel
+ * Function : can_format_motorola2userdata
  * Author : leon.xie
  * Creat Date : 2018/09/28  10:44:22
  * Description : none
@@ -55,7 +55,7 @@ typedef union {
  * Return : as below
  * Modify : none
  **************************************************/
-int can_format_motorola2intel(UINT64 srcData,UINT8 startBit,
+int can_format_motorola2userdata(UINT64 srcData,UINT8 startBit,
 	UINT32 bitLen,UINT64 *dstDataOutput)
 {
 	RETURN_VAL_IF_FAIL(dstDataOutput, -1);
@@ -90,7 +90,7 @@ int can_format_motorola2intel(UINT64 srcData,UINT8 startBit,
 }
 
 /***************************************************
- * Function : can_format_intel2motorola
+ * Function : can_format_intel2userdata
  * Author : leon.xie
  * Creat Date : 2018/09/28  10:45:54
  * Description : none
@@ -98,12 +98,101 @@ int can_format_motorola2intel(UINT64 srcData,UINT8 startBit,
  * Return : as below
  * Modify : none
  **************************************************/
-int can_format_intel2motorola(UINT64 srcData,UINT8 startBit,
+int can_format_intel2userdata(UINT64 srcData,UINT8 startBit,
 	UINT32 bitLen,UINT64 *dstDataOutput)
 {
+	RETURN_VAL_IF_FAIL(dstDataOutput, -1);
+	RETURN_VAL_IF_FAIL(bitLen > 0 && bitLen <= 64, -1);
+	RETURN_VAL_IF_FAIL(startBit < 64 && bitLen <= startBit, -1);
+	int i;
+	UINT64 mask = 0;
+	UINT64 result = 0;
+
+	for(i = 0;i < bitLen;i++)
+	{
+		mask |= 1 << i;
+	}
+	
+	result = (srcData >> startBit) & mask;
+
+	*dstDataOutput = result;
+	printf("srcData=0x%llx, startBit=%u, bitLen=%u, mask=0x%llx, result=0x%llx, dstDataOutput=0x%llx \n",
+	srcData,startBit,bitLen,mask,result,*dstDataOutput);	
+	
     return 0;
 }
 
+
+/***************************************************
+ * Function : can_format_userdata2motorola
+ * Author : leon.xie
+ * Creat Date : 2018/09/28  13:56:17
+ * Description : none
+ * In-Parameter : as below
+ * Return : as below
+ * Modify : none
+ **************************************************/
+int can_format_userdata2motorola(UINT64 srcData,UINT8 startBit,
+	UINT32 bitLen,UINT64 *dstDataInOut)
+{
+	RETURN_VAL_IF_FAIL(dstDataInOut, -1);
+	RETURN_VAL_IF_FAIL(bitLen > 0 && bitLen <= 64, -1);
+	RETURN_VAL_IF_FAIL(startBit < 64 && bitLen <= startBit, -1);
+	
+	int i;
+	UINT64 mask = 0;
+	UINT64 result = *dstDataInOut;
+	can_data_format_u canDataFormat;
+
+	memset(&canDataFormat,0,sizeof(canDataFormat));
+	
+	for(i = 0;i < bitLen;i++)
+	{
+		mask |= 1 << i;
+	}
+
+	canDataFormat.data = (srcData & mask) << startBit;
+	// 2. 逆序字节序.
+	for(i = 0;i < 4;i++)
+	{
+		byte_swap(&canDataFormat.buf[i],&canDataFormat.buf[7-i]);
+	}
+	
+	//
+	result |= canDataFormat.data;
+	*dstDataInOut = result;
+    return 0;
+}
+
+/***************************************************
+ * Function : can_format_userdata2intel
+ * Author : leon.xie
+ * Creat Date : 2018/09/28  13:57:2
+ * Description : none
+ * In-Parameter : as below
+ * Return : as below
+ * Modify : none
+ **************************************************/
+int can_format_userdata2intel(UINT64 srcData,UINT8 startBit,
+	UINT32 bitLen,UINT64 *dstDataInOut)
+{
+	RETURN_VAL_IF_FAIL(dstDataInOut, -1);
+	RETURN_VAL_IF_FAIL(bitLen > 0 && bitLen <= 64, -1);
+	RETURN_VAL_IF_FAIL(startBit < 64 && bitLen <= startBit, -1);
+	int i;
+	UINT64 mask = 0;
+	UINT64 result = *dstDataInOut;
+	
+	for(i = 0;i < bitLen;i++)
+	{
+		mask |= 1 << i;
+	}
+
+	result |= (srcData & mask) << startBit;
+	*dstDataInOut = result;
+	
+    return 0;
+}
 
 
 #ifdef  __cplusplus

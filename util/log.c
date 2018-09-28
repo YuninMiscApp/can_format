@@ -75,7 +75,7 @@ void log_assert(const char *source
 	//
 	_log_buffer[sizeof(_log_buffer)-1] = 0;
     //output
-	printf(_log_buffer);
+	printf("%s",_log_buffer);
 	
 }
 

@@ -33,8 +33,14 @@ extern "C" {
 /* Exported variables --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-int can_format_motorola2intel(UINT64 srcData,UINT8 startBit,
+int can_format_motorola2userdata(UINT64 srcData,UINT8 startBit,
 	UINT32 bitLen,UINT64 *dstDataOutput);
+int can_format_intel2userdata(UINT64 srcData,UINT8 startBit,
+	UINT32 bitLen,UINT64 *dstDataOutput);
+int can_format_userdata2motorola(UINT64 srcData,UINT8 startBit,
+	UINT32 bitLen,UINT64 *dstDataInOut);
+int can_format_userdata2intel(UINT64 srcData,UINT8 startBit,
+	UINT32 bitLen,UINT64 *dstDataInOut);
 
 #ifdef  __cplusplus
 }
